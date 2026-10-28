@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ติว AI ปลายภาค · Lecture 08–13 · เว็บสอน + ข้อสอบจำลอง</title>
+<style>
+:root{
+  --bg:#f4f6fb; --panel:#ffffff; --ink:#1b2433; --mut:#5d6b82; --line:#dfe5ee; --brand:#1f5fa8; --brand2:#13294b;
+  --def:#5f3dc4; --defbg:#f1edff; --key:#2b8a3e; --keybg:#ebfbee; --warn:#d9480f; --warnbg:#fff2e6; --ex:#1864ab; --exbg:#e9f3fd;
+  --think:#a61e4d; --thinkbg:#fff0f6; --code:#f1f3f6; --ok:#2b8a3e; --bad:#c92a2a; --side:#13294b; --sideink:#dfe8f5;
+}
+body.dark{
+  --bg:#0f1520; --panel:#172131; --ink:#e3e9f2; --mut:#9aa8bd; --line:#2a3850; --brand:#6ea8ff; --brand2:#cfe0ff;
+  --defbg:#241d3d; --keybg:#16301f; --warnbg:#3a2414; --exbg:#132a42; --thinkbg:#381827; --code:#0f1a29; --side:#0b111b; --sideink:#c9d6ea;
+  --def:#b197fc; --key:#69db7c; --warn:#ffa94d; --ex:#74c0fc; --think:#f783ac;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Leelawadee UI','Sarabun','Noto Sans Thai',Tahoma,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.65}
+a{color:var(--brand)}
+#app{display:flex;min-height:100vh}
+/* sidebar */
+#side{width:270px;flex:0 0 270px;background:var(--side);color:var(--sideink);position:sticky;top:0;height:100vh;overflow:auto;padding:14px 12px 30px}
+#side .logo{font-weight:800;font-size:18px;color:#fff;line-height:1.3;margin:4px 6px 12px}
+#side .logo small{display:block;font-weight:400;font-size:12px;color:#9fb6d9}
+#side .grp{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7f97bd;margin:16px 8px 6px}
+#side a.nav{display:flex;align-items:center;gap:8px;color:var(--sideink);text-decoration:none;padding:7px 10px;border-radius:8px;font-size:14.5px;line-height:1.35}
+#side a.nav:hover{background:rgba(255,255,255,.07)}
+#side a.nav.on{background:#1f5fa8;color:#fff}
+#side a.nav .num{flex:0 0 34px;font-weight:700;font-size:12px;background:rgba(255,255,255,.1);border-radius:6px;text-align:center;padding:2px 0}
+#side a.nav .done{margin-left:auto;color:#8ce99a;font-size:13px}
+#side .prog{margin:10px 8px;font-size:12px;color:#9fb6d9}
+#side .bar{height:6px;background:rgba(255,255,255,.12);border-radius:4px;overflow:hidden;margin-top:4px}
+#side .bar i{display:block;height:100%;background:#51cf66;width:0}
+#main{flex:1;min-width:0}
+#top{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:8px 18px}
+#top .crumb{font-weight:700;color:var(--brand2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#top button{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 10px;cursor:pointer;font:inherit;font-size:14px}
+#menuBtn{display:none}
+#view{max-width:1020px;margin:0 auto;padding:22px 22px 80px}
+@media (max-width:900px){#side{position:fixed;left:-290px;z-index:20;transition:left .2s}#side.open{left:0}#menuBtn{display:inline-block}#view{padding:14px 12px 70px}}
+/* generic */
+h1{font-size:30px;line-height:1.25;margin:6px 0 6px;color:var(--brand2)}
+h2{font-size:23px;line-height:1.3;margin:34px 0 10px;color:var(--brand2);padding-bottom:6px;border-bottom:2px solid var(--line)}
+h3{font-size:19px;margin:22px 0 8px;color:var(--brand)}
+h4{font-size:16.5px;margin:16px 0 6px}
+p{margin:0 0 12px}
+.lead{font-size:17.5px;color:var(--mut)}
+.mut{color:var(--mut)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:0 0 16px;box-shadow:0 1px 3px rgba(20,40,80,.05)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.callout{border-left:4px solid var(--ex);background:var(--exbg);padding:10px 14px;border-radius:0 10px 10px 0;margin:0 0 14px}
+.callout>:last-child{margin-bottom:0}
+.callout .lb{font-weight:800;margin-right:6px}
+.callout.def{border-color:var(--def);background:var(--defbg)} .callout.def .lb{color:var(--def)}
+.callout.key{border-color:var(--key);background:var(--keybg)} .callout.key .lb{color:var(--key)}
+.callout.warn{border-color:var(--warn);background:var(--warnbg)} .callout.warn .lb{color:var(--warn)}
+.callout.ex{border-color:var(--ex);background:var(--exbg)} .callout.ex .lb{color:var(--ex)}
+.callout.think{border-color:var(--think);background:var(--thinkbg)} .callout.think .lb{color:var(--think)}
+.formula{font-family:Consolas,'Cascadia Mono',monospace;background:var(--code);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:0 0 14px;white-space:pre-wrap;font-size:15px;overflow-x:auto}
+code{font-family:Consolas,'Cascadia Mono',monospace;background:var(--code);border-radius:5px;padding:1px 5px;font-size:.92em}
+table.tbl{width:100%;border-collapse:collapse;margin:0 0 16px;font-size:15px;background:var(--panel)}
+table.tbl th{background:#1f3a5f;color:#fff;text-align:left;padding:7px 10px;font-weight:600}
+table.tbl td{padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.tbl tr:nth-child(even) td{background:rgba(31,95,168,.04)}
+.tblwrap{overflow-x:auto}
+figure.slide{margin:0 0 16px;text-align:center}
+figure.slide img{max-width:100%;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);cursor:zoom-in}
+figure.slide figcaption{font-size:13.5px;color:var(--mut);margin-top:4px}
+details.reveal{background:var(--thinkbg);border:1px dashed var(--think);border-radius:10px;padding:8px 14px;margin:0 0 14px}
+details.reveal>summary{cursor:pointer;font-weight:700;color:var(--think)}
+details.reveal[open]>summary{margin-bottom:8px}
+ol.steps{counter-reset:s;list-style:none;padding-left:0}
+ol.steps>li{counter-increment:s;position:relative;padding-left:40px;margin-bottom:10px}
+ol.steps>li::before{content:counter(s);position:absolute;left:0;top:1px;width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;font-weight:700;text-align:center;line-height:28px;font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 18px;position:sticky;top:50px;z-index:3;background:var(--bg);padding:6px 0}
+.chips a{font-size:13.5px;text-decoration:none;border:1px solid var(--line);background:var(--panel);border-radius:20px;padding:3px 11px;color:var(--ink)}
+.chips a:hover{border-color:var(--brand);color:var(--brand)}
+.badge{display:inline-block;font-size:12px;font-weight:700;background:var(--exbg);color:var(--ex);border-radius:20px;padding:1px 9px;margin-right:6px}
+/* demos */
+.demo{border:2px solid var(--brand);border-radius:14px;padding:14px 16px;margin:0 0 18px;background:var(--panel)}
+.demo>h4:first-child{margin-top:0;color:var(--brand)}
+.demo label{font-size:14.5px;margin-right:10px;white-space:nowrap}
+.demo input[type=number],.demo input[type=text],.demo select{font:inherit;font-size:15px;padding:3px 7px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);width:90px}
+.demo input[type=text]{width:220px}
+.demo input[type=range]{vertical-align:middle;width:180px}
+.demo button,.btn{font:inherit;font-size:14.5px;border:0;background:var(--brand);color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;margin:4px 6px 4px 0}
+.btn.ghost,.demo button.ghost{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+.btn.ok{background:var(--ok)} .btn.bad{background:var(--bad)}
+.demo .out{font-family:Consolas,'Cascadia Mono',monospace;font-size:14.5px;background:var(--code);border-radius:10px;padding:10px 12px;margin-top:10px;white-space:pre-wrap;overflow-x:auto}
+.demo canvas{max-width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;display:block;margin:8px 0}
+.row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:6px 0}
+/* quiz */
+.quiz .qi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:0 0 12px}
+.quiz .qt{font-weight:600;margin-bottom:8px}
+.quiz .opt{display:block;border:1px solid var(--line);border-radius:9px;padding:7px 12px;margin:5px 0;cursor:pointer;background:var(--bg)}
+.quiz .opt:hover{border-color:var(--brand)}
+.quiz .opt.sel{border-color:var(--brand);background:var(--exbg)}
+.quiz .opt.right{border-color:var(--ok);background:var(--keybg)}
+.quiz .opt.wrong{border-color:var(--bad);background:var(--warnbg)}
+.quiz .ex{display:none;margin-top:8px;font-size:15px;border-left:3px solid var(--ex);padding:4px 10px;background:var(--exbg);border-radius:0 8px 8px 0}
+.quiz .qi.shown .ex{display:block}
+.score{font-size:20px;font-weight:800;color:var(--brand2)}
+/* exam */
+.sheet{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:8px 0}
+.sheet a{display:block;text-align:center;font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:3px 0;text-decoration:none;color:var(--ink);background:var(--panel)}
+.sheet a.ans{background:var(--brand);color:#fff;border-color:var(--brand)}
+.sheet a.right{background:var(--ok);color:#fff;border-color:var(--ok)}
+.sheet a.wrong{background:var(--bad);color:#fff;border-color:var(--bad)}
+.exambar{position:sticky;top:50px;z-index:4;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.timer{font-family:Consolas,monospace;font-weight:700;font-size:18px;color:var(--brand)}
+textarea.ans{width:100%;min-height:110px;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg);color:var(--ink)}
+.lecTag{font-size:12px;font-weight:700;border-radius:6px;padding:1px 7px;background:var(--code);color:var(--mut);margin-left:6px}
+/* flashcards */
+.flash{perspective:1200px;max-width:640px;margin:10px auto}
+.flash .fc{position:relative;height:300px;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
+.flash .fc.flip{transform:rotateY(180deg)}
+.flash .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;padding:26px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:21px;border:2px solid var(--line);background:var(--panel);overflow:auto}
+.flash .back{transform:rotateY(180deg);background:var(--exbg);font-size:18px}
+.home-hero{background:linear-gradient(135deg,#13294b,#1f5fa8);color:#fff;border-radius:18px;padding:26px 26px 20px;margin-bottom:18px}
+.home-hero h1{color:#fff;margin-top:0}
+.home-hero p{color:#dbe7fb}
+.lcard{display:block;text-decoration:none;color:var(--ink)}
+.lcard .card{height:100%}
+.lcard .card:hover{border-color:var(--brand);transform:translateY(-1px)}
+.lcard h3{margin:2px 0 6px}
+#zoom{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out}
+#zoom img{max-width:96vw;max-height:94vh;border-radius:8px}
+/* ===== visuals (illustrations / steppers / animations) ===== */
+:root{--c1:#1f6fd1;--c1l:#dbeafe;--c2:#e8590c;--c2l:#ffe8d6;--c3:#2b8a3e;--c3l:#d3f9d8;--c4:#7048e8;--c4l:#e5dbff;--c5:#e03131;--c5l:#ffe3e3;--c6:#0c8599;--c6l:#c5f6fa;--c7:#f59f00;--c7l:#fff3bf;--vbg:#ffffff;--vgrid:#e9eef5;--vline:#8a99b0}
+body.dark{--c1:#4dabf7;--c1l:#1b3a5c;--c2:#ff922b;--c2l:#4a2b14;--c3:#51cf66;--c3l:#173d22;--c4:#9775fa;--c4l:#2f2557;--c5:#ff6b6b;--c5l:#4a1f1f;--c6:#3bc9db;--c6l:#11393f;--c7:#fcc419;--c7l:#453812;--vbg:#121b2a;--vgrid:#22304a;--vline:#6f819e}
+.visual{background:var(--vbg);border:1px solid var(--line);border-radius:16px;padding:12px 14px 10px;margin:4px 0 20px;box-shadow:0 2px 10px rgba(20,40,80,.07);position:relative}
+.visual::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 4px 4px 0;background:linear-gradient(var(--c1),var(--c4))}
+.visual .vhead{font-weight:800;color:var(--brand2);font-size:16.5px;margin:0 0 6px 6px}
+.visual .vhead .vk{font-size:11.5px;font-weight:700;color:#fff;background:linear-gradient(90deg,var(--c1),var(--c4));border-radius:20px;padding:1px 9px;margin-right:8px;vertical-align:2px}
+.visual .vcap{font-size:14px;color:var(--mut);margin:6px 4px 0 6px}
+.visual svg{width:100%;height:auto;display:block;max-width:900px;margin:0 auto;overflow:visible}
+.visual svg text{font-family:'Leelawadee UI','Sarabun','Noto Sans Thai',Tahoma,sans-serif;fill:var(--ink)}
+.visual svg .tm{fill:var(--mut)} .visual svg .tw{fill:#fff} .visual svg .tb{font-weight:700}
+.visual svg .ln{stroke:var(--vline);fill:none} .visual svg .grid{stroke:var(--vgrid)} .visual svg .bgp{fill:var(--bg)}
+.f1{fill:var(--c1)}.f2{fill:var(--c2)}.f3{fill:var(--c3)}.f4{fill:var(--c4)}.f5{fill:var(--c5)}.f6{fill:var(--c6)}.f7{fill:var(--c7)}
+.f1l{fill:var(--c1l)}.f2l{fill:var(--c2l)}.f3l{fill:var(--c3l)}.f4l{fill:var(--c4l)}.f5l{fill:var(--c5l)}.f6l{fill:var(--c6l)}.f7l{fill:var(--c7l)}
+.s1{stroke:var(--c1)}.s2{stroke:var(--c2)}.s3{stroke:var(--c3)}.s4{stroke:var(--c4)}.s5{stroke:var(--c5)}.s6{stroke:var(--c6)}.s7{stroke:var(--c7)}
+.nofill{fill:none}
+/* animation helpers usable inside SVG */
+@keyframes vflow{to{stroke-dashoffset:-24}} .v-flow{stroke-dasharray:8 4;animation:vflow 1s linear infinite}
+@keyframes vpulse{0%,100%{opacity:1}50%{opacity:.35}} .v-pulse{animation:vpulse 1.6s ease-in-out infinite}
+@keyframes vfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}} .v-float{animation:vfloat 2.4s ease-in-out infinite;transform-box:fill-box}
+@keyframes vspin{to{transform:rotate(360deg)}} .v-spin{animation:vspin 6s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes vblink{0%,100%{opacity:0}40%,60%{opacity:1}} .v-blink{animation:vblink 2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.v-flow,.v-pulse,.v-float,.v-spin,.v-blink{animation:none}}
+/* stepper: elements with data-s="n" appear at step n; data-only="n" only at step n; captions = <ol class="caps"><li>…</li></ol> */
+.stepper [data-s],.stepper [data-only]{transition:opacity .45s ease}
+.stepper .hide{opacity:0!important;pointer-events:none}
+.stepper ol.caps{list-style:none;padding:0;margin:6px 0 0}
+.stepper ol.caps li{display:none;font-size:15px;background:var(--exbg);border-left:4px solid var(--ex);border-radius:0 10px 10px 0;padding:7px 12px}
+.stepper ol.caps li.on{display:block}
+.stepper .sctl{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.stepper .sctl button{font:inherit;font-size:14px;border:1px solid var(--brand);background:var(--panel);color:var(--brand);border-radius:8px;padding:3px 12px;cursor:pointer}
+.stepper .sctl button.pri{background:var(--brand);color:#fff}
+.stepper .dots{display:flex;gap:5px;margin-left:4px}
+.stepper .dots i{width:10px;height:10px;border-radius:50%;background:var(--line);cursor:pointer;display:block}
+.stepper .dots i.on{background:var(--brand)}
+.stepper .sno{font-size:13px;color:var(--mut);margin-left:auto}
+.vgal-sec{font-size:13px;color:var(--mut);margin:-4px 0 6px 6px}
+@media print{#side,#top,.noprint{display:none!important}#view{max-width:none;padding:0}body{background:#fff;color:#000}.card,.quiz .qi{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav id="side"></nav>
+  <div id="main">
+    <div id="top"><button id="menuBtn">☰</button><div class="crumb" id="crumb">ติว AI ปลายภาค</div>
+      <button id="darkBtn" title="สลับโหมดมืด">🌓</button></div>
+    <div id="view"></div>
+  </div>
+</div>
+<div id="zoom"><img alt=""></div>
+
+<script>
+/* ===================== TUTOR CORE ===================== */
+window.TUTOR = (function () {
+  const T = { lessons: [], pages: {} };
+  const LS = 'aiFinalTutor.v1';
+  const store = JSON.parse(localStorage.getItem(LS) || '{}');
+  T.save = () => localStorage.setItem(LS, JSON.stringify(store));
+  T.store = store;
+  /* error log (used by headless smoke tests: #errlog in the DOM) */
+  T.logErr = msg => { let el = document.getElementById('errlog'); if (!el) { el = document.createElement('pre'); el.id = 'errlog'; el.style.display = 'none'; document.body.appendChild(el); } el.textContent += msg + '\n'; };
+  window.addEventListener('error', e => T.logErr('JS error: ' + e.message + ' @ ' + (e.filename || '').split('/').pop() + ':' + e.lineno));
+
+  /* ---------- math helpers for demos ---------- */
+  T.fmt = (x, d = 3) => (typeof x === 'number' && isFinite(x)) ? (+x.toFixed(d)).toString() : String(x);
+  T.sigmoid = z => 1 / (1 + Math.exp(-z));
+  T.softmax = (z, Tmp = 1) => { const m = Math.max(...z.map(v => v / Tmp)); const e = z.map(v => Math.exp(v / Tmp - m)); const s = e.reduce((a, b) => a + b, 0); return e.map(v => v / s); };
+  T.dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
+  T.norm = a => Math.sqrt(T.dot(a, a));
+  T.cosine = (a, b) => T.dot(a, b) / (T.norm(a) * T.norm(b));
+  T.nums = s => String(s).split(/[\s,;]+/).filter(Boolean).map(Number);
+  T.$ = (root, sel) => root.querySelector(sel);
+  T.$$ = (root, sel) => Array.from(root.querySelectorAll(sel));
+  T.esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  /* ---------- registration ---------- */
+  T.addLesson = l => { T.lessons.push(l); T.lessons.sort((a, b) => a.num - b.num); };
+  T.addPage = (id, p) => { T.pages[id] = p; };
+
+  /* ---------- visuals ----------
+     TUTOR.addVisuals('L08', [{ id:'neuron', section:'<section id in lesson>' | 'intro', pos:'top'|'bottom',
+        title:'…', kind:'ภาพนิ่ง'|'ทีละขั้น'|'เคลื่อนไหว', html:'<svg…>…</svg>' (or a .stepper block), caption:'…', init(el){} }]) */
+  T.visuals = {};
+  T.addVisuals = (lessonId, list) => { (T.visuals[lessonId] = T.visuals[lessonId] || []).push(...list); };
+  /* stepper: <div class="stepper"> <svg> … <g data-s="2">appears at step 2</g> <g data-only="3">only step 3</g> … </svg>
+                <ol class="caps"><li>caption step 1</li><li>caption step 2</li>…</ol> </div>  (number of steps = number of <li>) */
+  T.stepper = function (el, startAtEnd) {
+    const caps = T.$$(el, 'ol.caps > li'); const n = Math.max(1, caps.length); let cur = startAtEnd ? n : 1, timer = null;
+    const ctl = document.createElement('div'); ctl.className = 'sctl noprint';
+    ctl.innerHTML = `<button data-a="prev">◀ ย้อน</button><button class="pri" data-a="next">ถัดไป ▶</button><button data-a="play">▶ เล่นอัตโนมัติ</button><button data-a="reset">⟲ เริ่มใหม่</button><span class="dots">${Array.from({ length: n }, (_, i) => `<i data-i="${i + 1}"></i>`).join('')}</span><span class="sno"></span>`;
+    el.appendChild(ctl);
+    const show = () => {
+      T.$$(el, '[data-s]').forEach(g => g.classList.toggle('hide', +g.getAttribute('data-s') > cur));
+      T.$$(el, '[data-only]').forEach(g => g.classList.toggle('hide', !String(g.getAttribute('data-only')).split(',').map(Number).includes(cur)));
+      caps.forEach((c, i) => c.classList.toggle('on', i === cur - 1));
+      T.$$(ctl, '.dots i').forEach((d, i) => d.classList.toggle('on', i < cur));
+      T.$(ctl, '.sno').textContent = `ขั้นที่ ${cur}/${n}`;
+    };
+    const stop = () => { clearInterval(timer); timer = null; T.$(ctl, '[data-a=play]').textContent = '▶ เล่นอัตโนมัติ'; };
+    ctl.addEventListener('click', e => {
+      const a = e.target.closest('[data-a]'), d = e.target.closest('.dots i');
+      if (d) { stop(); cur = +d.dataset.i; show(); return; }
+      if (!a) return;
+      const act = a.dataset.a;
+      if (act === 'prev') { stop(); cur = Math.max(1, cur - 1); }
+      if (act === 'next') { stop(); cur = Math.min(n, cur + 1); }
+      if (act === 'reset') { stop(); cur = 1; }
+      if (act === 'play') { if (timer) { stop(); } else { if (cur >= n) cur = 1; a.textContent = '⏸ หยุด'; timer = setInterval(() => { if (cur >= n || !document.body.contains(el)) { stop(); return; } cur++; show(); }, 2600); } }
+      show();
+    });
+    show();
+  };
+  T.mountVisual = function (holder, v, lessonId) {
+    const el = document.createElement('div'); el.className = 'visual'; el.id = `vis-${lessonId}-${v.id}`;
+    el.innerHTML = `<div class="vhead"><span class="vk">${v.kind || 'ภาพประกอบ'}</span>${v.title || ''}</div>${v.html || ''}${v.caption ? `<div class="vcap">💡 ${v.caption}</div>` : ''}`;
+    holder.appendChild(el);
+    const all = /!all/.test(location.hash);
+    T.$$(el, '.stepper').forEach(s => T.stepper(s, all));
+    try { v.init && v.init(el); } catch (e) { console.error(e); T.logErr(`visual ${lessonId}/${v.id}: ${e.message}`); }
+    return el;
+  };
+  function placeVisuals(root, l) {
+    (T.visuals[l.id] || []).forEach(v => {
+      let sec = v.section === 'intro' ? null : document.getElementById('sec-' + v.section);
+      const holder = document.createElement('div');
+      if (v.section === 'intro') { const anchor = T.$(root, '.chips'); anchor.parentNode.insertBefore(holder, anchor); }
+      else if (sec) { const h2 = T.$(sec, 'h2'); if (v.pos === 'bottom') sec.appendChild(holder); else { const after = sec._vAfter || h2; after.parentNode.insertBefore(holder, after.nextSibling); sec._vAfter = holder; } }
+      else { T.logErr(`visual ${l.id}/${v.id}: section "${v.section}" not found`); return; }
+      T.mountVisual(holder, v, l.id);
+    });
+  }
+
+  /* ---------- mini quiz (instant feedback) ----------
+     items: [{q:'html', c:['A','B','C','D'], a:indexOfCorrect, e:'html explanation'}] */
+  T.quiz = function (el, items, key) {
+    el.classList.add('quiz');
+    const st = (store.quiz = store.quiz || {})[key] = (store.quiz[key] || {});
+    el.innerHTML = items.map((it, i) => `<div class="qi" data-i="${i}"><div class="qt">${i + 1}. ${it.q}</div>${it.c.map((c, j) => `<label class="opt" data-j="${j}">${String.fromCharCode(65 + j)}. ${c}</label>`).join('')}<div class="ex"><b>เฉลย ${String.fromCharCode(65 + it.a)}</b> — ${it.e || ''}</div></div>`).join('') + `<div class="row"><span class="score"></span><button class="btn ghost qreset">ล้างคำตอบ</button></div>`;
+    const paint = () => {
+      let ok = 0, n = 0;
+      T.$$(el, '.qi').forEach(q => {
+        const i = +q.dataset.i, ans = st[i];
+        q.classList.toggle('shown', ans !== undefined);
+        T.$$(q, '.opt').forEach(o => { const j = +o.dataset.j; o.className = 'opt' + (ans === undefined ? '' : (j === items[i].a ? ' right' : (j === ans ? ' wrong' : ''))); });
+        if (ans !== undefined) { n++; if (ans === items[i].a) ok++; }
+      });
+      T.$(el, '.score').textContent = n ? `ได้ ${ok}/${n} ข้อที่ตอบ (ทั้งหมด ${items.length} ข้อ)` : `${items.length} ข้อ — คลิกตัวเลือกเพื่อดูเฉลยทันที`;
+    };
+    el.addEventListener('click', e => {
+      const o = e.target.closest('.opt');
+      if (o) { const i = +o.closest('.qi').dataset.i; if (st[i] === undefined) { st[i] = +o.dataset.j; T.save(); paint(); } }
+      if (e.target.closest('.qreset')) { Object.keys(st).forEach(k => delete st[k]); T.save(); paint(); }
+    });
+    paint();
+  };
+
+  /* ---------- sidebar ---------- */
+  function side(active) {
+    const done = store.done || {};
+    const n = T.lessons.filter(l => done[l.id]).length;
+    const link = (href, inner, on) => `<a class="nav${on ? ' on' : ''}" href="${href}">${inner}</a>`;
+    let h = `<div class="logo">🎓 ติว AI ปลายภาค<small>Lecture 08–13 · สอนทีละขั้น + ข้อสอบจำลอง</small></div>`;
+    h += link('#/home', '🏠 หน้าแรก / แผนอ่าน', active === 'home');
+    h += `<div class="grp">บทเรียน</div>`;
+    T.lessons.forEach(l => { h += link('#/lesson/' + l.id, `<span class="num">${l.id}</span><span>${l.navTitle || l.title}</span>${done[l.id] ? '<span class="done">✔</span>' : ''}`, active === l.id); });
+    h += `<div class="prog">อ่านจบแล้ว ${n}/${T.lessons.length} บท<div class="bar"><i style="width:${T.lessons.length ? 100 * n / T.lessons.length : 0}%"></i></div></div>`;
+    h += `<div class="grp">ทบทวน</div>`;
+    h += link('#/formulas', '🧮 สูตรทั้งหมด', active === 'formulas');
+    h += link('#/flash', '🃏 แฟลชการ์ด', active === 'flash');
+    h += `<div class="grp">ข้อสอบจำลอง</div>`;
+    h += link('#/exam', '📝 ภาพรวมข้อสอบจำลอง', active === 'exam');
+    h += link('#/exam/mcq', '🅰️ ตอนที่ 2 · ปรนัย 50 ข้อ', active === 'mcq');
+    h += link('#/exam/written', '✍️ ตอนที่ 1 · อัตนัย 3 ข้อ', active === 'written');
+    document.getElementById('side').innerHTML = h;
+  }
+
+  /* ---------- views ---------- */
+  function viewHome(v) {
+    const done = store.done || {};
+    v.innerHTML = `<div class="home-hero"><h1>ติวปลายภาค ปัญญาประดิษฐ์ (Lecture 08–13)</h1>
+      <p>เว็บนี้สอนเนื้อหาทั้ง 6 บทแบบเข้าใจจริง: อธิบายทีละขั้น · ภาพจากสไลด์ · เครื่องมือคำนวณให้กดลองเอง · แบบฝึกท้ายบท · แฟลชการ์ด · และ <b>ข้อสอบจำลองรูปแบบเดียวกับข้อสอบจริง</b> (อัตนัย 3 ข้อ 15 คะแนน + ปรนัย 50 ข้อ 15 คะแนน)</p>
+      <div class="row"><a class="btn" href="#/lesson/${T.lessons[0] ? T.lessons[0].id : 'L08'}" style="text-decoration:none">เริ่มเรียนบทแรก →</a><a class="btn ghost" style="background:#fff;text-decoration:none" href="#/exam">ไปที่ข้อสอบจำลอง</a></div></div>
+      <div class="callout think"><span class="lb">เริ่มจากศูนย์?</span>เริ่มที่บท <a href="#/lesson/L00"><b>L00 · เริ่มจากศูนย์</b></a> (คณิตและศัพท์พื้นฐานทั้งหมดที่ต้องใช้ พร้อมภาพ) → แล้วเรียน L08 → L13 ตามลำดับ · ในแต่ละบทให้ดู <b>“บทนี้ใน 1 ภาพ”</b> ด้านบนก่อน แล้วอ่านทีละหัวข้อ — ทุกหัวข้อมี<b>ภาพประกอบอยู่ใต้หัวข้อ</b> ให้ดูภาพก่อนอ่านตัวหนังสือ</div>
+      <div class="grid3">${T.lessons.map(l => `<a class="lcard" href="#/lesson/${l.id}"><div class="card"><span class="badge">${l.id}</span>${done[l.id] ? '<span class="badge" style="background:var(--keybg);color:var(--key)">อ่านแล้ว ✔</span>' : ''}<h3>${l.title}</h3><div class="mut" style="font-size:14px">${l.short || ''}</div></div></a>`).join('')}</div>
+      <h2>แผนอ่าน 7 วัน (แนะนำ)</h2>
+      <table class="tbl"><tr><th>วัน</th><th>ทำอะไร</th></tr>
+      <tr><td>1</td><td>L08 Perceptron/Adaline/GD/MLP — ฝึกคำนวณ update 1 ก้าวด้วยเครื่องมือในบท</td></tr>
+      <tr><td>2</td><td>L09 K-Means/เลือก K/Hierarchical/GMM/DBSCAN/PCA — ทำตัวอย่าง 7 ลูกค้าด้วยมือ</td></tr>
+      <tr><td>3</td><td>L10 MDP/Return/Policy/Q-learning/DQN/Reward — ฝึก Return และ Q-update</td></tr>
+      <tr><td>4</td><td>L11 Convolution/Output size/Params/Tasks/Transfer — ฝึกสูตร O และจำนวนพารามิเตอร์</td></tr>
+      <tr><td>5</td><td>L12 Token/TF-IDF/Embedding/RNN/Attention/Transformer/LLM — ฝึก attention และ softmax</td></tr>
+      <tr><td>6</td><td>L13 Reasoning/Agent/RAG/MCP/Quantum — ฝึก pⁿ, majority vote, qubit</td></tr>
+      <tr><td>7</td><td>ทำข้อสอบจำลองแบบจับเวลา → ทวนข้อที่ผิด → แฟลชการ์ด → อ่านชีท A4 อีกรอบ</td></tr></table>
+      <div class="callout key"><span class="lb">เคล็ดลับ</span>ทุกบทมีกล่อง <b>“ลองคิดก่อน”</b> ให้ตอบในใจก่อนกดดูเฉลย และมี <b>แบบฝึกท้ายบท</b> ที่ตรวจทันที — ทำครบทุกบทเท่ากับได้ซ้อมข้อสอบเพิ่มอีกหลายสิบข้อ</div>
+      <p class="mut">ความคืบหน้า คำตอบ และคะแนนจะถูกจำไว้ในเบราว์เซอร์นี้ (localStorage) · เปิดไฟล์ได้แบบ offline · กดรูปสไลด์เพื่อขยาย</p>`;
+  }
+
+  function viewLesson(v, id, sec) {
+    const l = T.lessons.find(x => x.id === id);
+    if (!l) { v.innerHTML = '<p>ไม่พบบทเรียน</p>'; return; }
+    const i = T.lessons.indexOf(l), prev = T.lessons[i - 1], next = T.lessons[i + 1];
+    const done = (store.done = store.done || {});
+    v.innerHTML = `<span class="badge">${l.id}</span><span class="mut">${l.slides || ''}</span>
+      <h1>${l.title}</h1><p class="lead">${l.intro || l.short || ''}</p>
+      <div class="chips noprint">${l.sections.map(s => `<a href="#/lesson/${l.id}/${s.id}">${s.title}</a>`).join('')}${l.quiz ? `<a href="#/lesson/${l.id}/quiz">📝 แบบฝึกท้ายบท</a>` : ''}</div>
+      ${l.sections.map(s => `<section id="sec-${s.id}"><h2>${s.title}</h2>${s.html}</section>`).join('')}
+      ${l.quiz ? `<section id="sec-quiz"><h2>📝 แบบฝึกท้ายบท ${l.id} (${l.quiz.length} ข้อ)</h2><div id="lquiz"></div></section>` : ''}
+      <div class="card" style="margin-top:24px"><div class="row" style="justify-content:space-between">
+        ${prev ? `<a class="btn ghost" href="#/lesson/${prev.id}" style="text-decoration:none">← ${prev.id}</a>` : '<span></span>'}
+        <button class="btn ${done[l.id] ? 'ok' : ''}" id="markDone">${done[l.id] ? '✔ อ่านบทนี้แล้ว' : 'ทำเครื่องหมายว่าอ่านจบแล้ว'}</button>
+        ${next ? `<a class="btn" href="#/lesson/${next.id}" style="text-decoration:none">${next.id} →</a>` : `<a class="btn" href="#/exam" style="text-decoration:none">ไปทำข้อสอบจำลอง →</a>`}
+      </div></div>`;
+    if (l.quiz) T.quiz(document.getElementById('lquiz'), l.quiz, l.id);
+    placeVisuals(v, l);
+    document.getElementById('markDone').onclick = () => { done[l.id] = !done[l.id]; T.save(); route(); };
+    try { l.init && l.init(v); } catch (e) { console.error(e); T.logErr('init ' + l.id + ': ' + e.message); }
+    if (sec) { const el = document.getElementById('sec-' + sec); if (el) setTimeout(() => el.scrollIntoView(), 30); } else window.scrollTo(0, 0);
+  }
+
+  function viewFlash(v) {
+    const all = window.FLASHCARDS || [];
+    const fs = (store.flash = store.flash || { known: {} });
+    const lecs = [...new Set(all.map(c => c.lec))];
+    let filt = fs.filt || 'all', onlyUnknown = !!fs.onlyUnknown, order = null, pos = 0;
+    function deck() { let d = all.map((c, i) => ({ ...c, i })).filter(c => (filt === 'all' || c.lec === filt) && (!onlyUnknown || !fs.known[c.i])); if (order) d.sort((a, b) => order[a.i] - order[b.i]); return d; }
+    function draw() {
+      const d = deck(); if (pos >= d.length) pos = 0;
+      const c = d[pos], known = Object.keys(fs.known).filter(k => fs.known[k]).length;
+      v.innerHTML = `<h1>🃏 แฟลชการ์ด</h1><p class="lead">คลิกการ์ด (หรือกด Space) เพื่อพลิก · ← → เลื่อน · กด “จำได้แล้ว” เพื่อตัดออกจากกองที่ต้องทวน</p>
+      <div class="row noprint"><select id="fl">${['all', ...lecs].map(x => `<option value="${x}" ${x === filt ? 'selected' : ''}>${x === 'all' ? 'ทุกบท' : x}</option>`).join('')}</select>
+      <label><input type="checkbox" id="fu" ${onlyUnknown ? 'checked' : ''}> เฉพาะใบที่ยังจำไม่ได้</label>
+      <button class="btn ghost" id="fsh">สับไพ่</button><span class="mut">จำได้แล้ว ${known}/${all.length} ใบ</span></div>
+      ${c ? `<div class="flash"><div class="fc" id="fc"><div class="face front"><div><span class="badge">${c.lec}</span><br>${c.f}</div></div><div class="face back"><div>${c.b}</div></div></div></div>
+      <div class="row" style="justify-content:center"><button class="btn ghost" id="fp">← ก่อนหน้า</button><span>${pos + 1} / ${d.length}</span><button class="btn ghost" id="fn">ถัดไป →</button></div>
+      <div class="row" style="justify-content:center"><button class="btn bad" id="fno">ยังจำไม่ได้</button><button class="btn ok" id="fyes">จำได้แล้ว ✔</button></div>` : '<div class="card">ไม่มีการ์ดในกองนี้ 🎉 (ลองยกเลิก “เฉพาะใบที่ยังจำไม่ได้”)</div>'}`;
+      const flip = () => document.getElementById('fc') && document.getElementById('fc').classList.toggle('flip');
+      v.querySelector('#fl').onchange = e => { filt = fs.filt = e.target.value; pos = 0; T.save(); draw(); };
+      v.querySelector('#fu').onchange = e => { onlyUnknown = fs.onlyUnknown = e.target.checked; pos = 0; T.save(); draw(); };
+      v.querySelector('#fsh').onclick = () => { order = {}; all.forEach((_, i) => order[i] = Math.random()); pos = 0; draw(); };
+      if (c) {
+        document.getElementById('fc').onclick = flip;
+        v.querySelector('#fp').onclick = () => { pos = (pos - 1 + d.length) % d.length; draw(); };
+        v.querySelector('#fn').onclick = () => { pos = (pos + 1) % d.length; draw(); };
+        v.querySelector('#fyes').onclick = () => { fs.known[c.i] = true; T.save(); if (!onlyUnknown) pos++; draw(); };
+        v.querySelector('#fno').onclick = () => { fs.known[c.i] = false; T.save(); pos++; draw(); };
+      }
+      document.onkeydown = e => { if (!location.hash.startsWith('#/flash')) return; if (e.code === 'Space') { e.preventDefault(); flip(); } if (e.key === 'ArrowRight') v.querySelector('#fn') && v.querySelector('#fn').click(); if (e.key === 'ArrowLeft') v.querySelector('#fp') && v.querySelector('#fp').click(); };
+    }
+    draw();
+  }
+
+  /* ---------- exam ---------- */
+  function viewExamHome(v) {
+    const E = window.EXAM || { mcq: [], written: [] };
+    const es = store.exam || {};
+    const mcqScore = es.mcqResult ? `${es.mcqResult.ok}/${E.mcq.length} ข้อ = <b>${T.fmt(es.mcqResult.ok * 15 / E.mcq.length, 2)}/15</b>` : 'ยังไม่ได้ส่ง';
+    const wr = es.wscore || {}; let wsum = 0; Object.values(wr).forEach(x => wsum += +x || 0);
+    v.innerHTML = `<h1>📝 ข้อสอบจำลองปลายภาค</h1><p class="lead">${E.title || ''} — รูปแบบเดียวกับข้อสอบจริง: <b>ตอนที่ 1 อัตนัย 3 ข้อ (มีข้อย่อย) 15 คะแนน</b> และ <b>ตอนที่ 2 ปรนัย 50 ข้อ 15 คะแนน</b> รวม 30 คะแนน · เวลาจริง 3 ชั่วโมง</p>
+      <div class="grid2"><div class="card"><h3>🅰️ ตอนที่ 2 · ปรนัย ${E.mcq.length} ข้อ</h3><p>มีโหมด <b>สอบจริง</b> (จับเวลา 60 นาที เฉลยหลังส่ง) และ <b>โหมดฝึก</b> (เฉลยทันทีทีละข้อ) · เลือกเฉพาะบทได้ · ทำซ้ำเฉพาะข้อที่ผิดได้</p><p>ผลล่าสุด: ${mcqScore}</p><a class="btn" style="text-decoration:none" href="#/exam/mcq">ไปทำปรนัย →</a></div>
+      <div class="card"><h3>✍️ ตอนที่ 1 · อัตนัย ${E.written.length} ข้อ</h3><p>พิมพ์/เขียนคำตอบลงกระดาษก่อน แล้วกดดูเฉลยพร้อมเกณฑ์ให้คะแนน แล้วให้คะแนนตัวเอง</p><p>คะแนนที่ให้ตัวเองล่าสุด: <b>${T.fmt(wsum, 2)}/15</b></p><a class="btn" style="text-decoration:none" href="#/exam/written">ไปทำอัตนัย →</a></div></div>
+      <div class="callout key"><span class="lb">วิธีซ้อมให้คุ้ม</span>ทำอัตนัยบนกระดาษจริงโดยเปิดชีท A4 ได้ (เหมือนวันสอบ) จับเวลา ~90 นาที → ทำปรนัยโหมดสอบจริง 60 นาที → ดูเฉลยและคำอธิบายทุกข้อที่ผิด → กด “ทำเฉพาะข้อที่ผิด” จนได้เต็ม</div>
+      <button class="btn ghost noprint" onclick="window.print()">🖨️ พิมพ์หน้านี้</button> <a class="btn ghost noprint" style="text-decoration:none" href="#/exam/print">🖨️ พิมพ์ข้อสอบจำลองทั้งชุด + เฉลย</a>`;
+  }
+
+  function viewMCQ(v) {
+    const E = window.EXAM || { mcq: [] };
+    const es = (store.exam = store.exam || {});
+    es.ans = es.ans || {}; es.mode = es.mode || 'practice'; es.filter = es.filter || 'all';
+    const lecs = [...new Set(E.mcq.map(q => q.lec))];
+    let timerId = null;
+    function list() { let L = E.mcq.filter(q => es.filter === 'all' || q.lec === es.filter || (es.filter === 'wrong' && es.mcqResult && es.mcqResult.wrong.includes(q.id))); return L; }
+    function draw() {
+      const L = list(), sub = es.submitted;
+      const answered = L.filter(q => es.ans[q.id] !== undefined).length;
+      v.innerHTML = `<h1>🅰️ ตอนที่ 2 · ปรนัย</h1>
+      <div class="exambar noprint"><div class="row">
+        <select id="mmode"><option value="practice" ${es.mode === 'practice' ? 'selected' : ''}>โหมดฝึก (เฉลยทันที)</option><option value="exam" ${es.mode === 'exam' ? 'selected' : ''}>โหมดสอบจริง (เฉลยหลังส่ง)</option></select>
+        <select id="mfilt"><option value="all">ทุกข้อ (${E.mcq.length})</option>${lecs.map(l => `<option value="${l}" ${es.filter === l ? 'selected' : ''}>เฉพาะ ${l}</option>`).join('')}${es.mcqResult && es.mcqResult.wrong.length ? `<option value="wrong" ${es.filter === 'wrong' ? 'selected' : ''}>เฉพาะข้อที่ผิด (${es.mcqResult.wrong.length})</option>` : ''}</select>
+        <span>ตอบแล้ว ${answered}/${L.length}</span>
+        ${es.mode === 'exam' && !sub ? `<span class="timer" id="tm"></span>` : ''}
+        ${es.mode === 'exam' && !sub ? `<button class="btn ok" id="msub">ส่งคำตอบ</button>` : ''}
+        <button class="btn ghost" id="mreset">เริ่มใหม่ (ล้างคำตอบ)</button></div>
+        <div class="sheet">${L.map((q, k) => { const a = es.ans[q.id]; let c = a !== undefined ? 'ans' : ''; if ((sub || es.mode === 'practice') && a !== undefined) c = a === q.a ? 'right' : 'wrong'; return `<a href="javascript:void(0)" data-go="${q.id}" class="${c}">${k + 1}</a>`; }).join('')}</div></div>
+      ${sub && es.mcqResult ? resultCard(L) : ''}
+      <div class="quiz">${L.map((q, k) => { const a = es.ans[q.id]; const show = sub || (es.mode === 'practice' && a !== undefined);
+        return `<div class="qi${show ? ' shown' : ''}" id="mq-${q.id}"><div class="qt">${k + 1}. ${q.q} <span class="lecTag">${q.lec}</span></div>
+        ${q.c.map((c, j) => { let cl = 'opt'; if (a === j) cl += ' sel'; if (show) { if (j === q.a) cl += ' right'; else if (j === a) cl += ' wrong'; } return `<label class="${cl}" data-q="${q.id}" data-j="${j}">${'กขคง'[j] || j}. ${c}</label>`; }).join('')}
+        <div class="ex"><b>เฉลย ${'กขคง'[q.a]}</b> — ${q.e || ''}</div></div>`; }).join('')}</div>
+      ${es.mode === 'exam' && !sub ? `<button class="btn ok" id="msub2">ส่งคำตอบ</button>` : ''}`;
+      v.querySelector('#mmode').onchange = e => { es.mode = e.target.value; es.submitted = false; if (es.mode === 'exam') es.start = Date.now(); T.save(); draw(); };
+      v.querySelector('#mfilt').onchange = e => { es.filter = e.target.value; T.save(); draw(); };
+      v.querySelector('#mreset').onclick = () => { if (!confirm('ล้างคำตอบปรนัยทั้งหมด?')) return; es.ans = {}; es.submitted = false; es.start = Date.now(); T.save(); draw(); };
+      v.querySelectorAll('.sheet a').forEach(a => a.onclick = () => document.getElementById('mq-' + a.dataset.go).scrollIntoView({ block: 'center' }));
+      v.querySelectorAll('.opt').forEach(o => o.onclick = () => {
+        const id = +o.dataset.q || o.dataset.q, j = +o.dataset.j;
+        if (sub) return; if (es.mode === 'practice' && es.ans[id] !== undefined) return;
+        es.ans[id] = j; T.save(); const y = window.scrollY; draw(); window.scrollTo(0, y);
+      });
+      const submit = () => { if (!confirm('ส่งคำตอบและดูผล?')) return; grade(); };
+      ['#msub', '#msub2'].forEach(s => { const b = v.querySelector(s); if (b) b.onclick = submit; });
+      clearInterval(timerId);
+      if (es.mode === 'exam' && !sub) {
+        es.start = es.start || Date.now(); T.save();
+        const tick = () => { const el = document.getElementById('tm'); if (!el) { clearInterval(timerId); return; } const left = 60 * 60 * 1000 - (Date.now() - es.start); if (left <= 0) { clearInterval(timerId); el.textContent = '00:00'; alert('หมดเวลา! ระบบส่งคำตอบให้อัตโนมัติ'); grade(); return; } const m = Math.floor(left / 60000), s = Math.floor(left / 1000) % 60; el.textContent = `⏱ ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; };
+        tick(); timerId = setInterval(tick, 1000);
+      }
+    }
+    function grade() {
+      const L = E.mcq; let ok = 0; const wrong = []; const by = {};
+      L.forEach(q => { by[q.lec] = by[q.lec] || [0, 0]; by[q.lec][1]++; if (es.ans[q.id] === q.a) { ok++; by[q.lec][0]++; } else wrong.push(q.id); });
+      es.mcqResult = { ok, wrong, by, at: Date.now() }; es.submitted = true; T.save(); draw(); window.scrollTo(0, 0);
+    }
+    function resultCard() {
+      const r = es.mcqResult, n = E.mcq.length;
+      return `<div class="card"><div class="score">ได้ ${r.ok}/${n} ข้อ → ${T.fmt(r.ok * 15 / n, 2)} / 15 คะแนน</div>
+        <table class="tbl"><tr><th>บท</th><th>ถูก</th><th>ทั้งหมด</th><th>%</th></tr>${Object.keys(r.by).sort().map(k => `<tr><td>${k}</td><td>${r.by[k][0]}</td><td>${r.by[k][1]}</td><td>${Math.round(100 * r.by[k][0] / r.by[k][1])}%</td></tr>`).join('')}</table>
+        <p class="mut">บทที่ได้ต่ำกว่า 70% → กลับไปอ่านบทนั้นในเว็บ + ชีท A4 แล้วเลือก “เฉพาะข้อที่ผิด” ทำซ้ำ</p></div>`;
+    }
+    draw();
+  }
+
+  function viewWritten(v) {
+    const E = window.EXAM || { written: [] };
+    const es = (store.exam = store.exam || {}); es.wans = es.wans || {}; es.wscore = es.wscore || {};
+    let total = 0; E.written.forEach(w => total += w.pts);
+    v.innerHTML = `<h1>✍️ ตอนที่ 1 · อัตนัย</h1><p class="lead">ตอบในกล่อง (หรือเขียนบนกระดาษ) ก่อน แล้วค่อยกด “ดูเฉลย + เกณฑ์” จากนั้นให้คะแนนตัวเองตามเกณฑ์ · รวม ${total} คะแนน</p>
+      ${E.written.map(w => `<div class="card"><h2 style="margin-top:4px">ข้อ ${w.id.replace(/\D/g, '')} · ${w.title} <span class="lecTag">${(w.lec || []).join(', ')}</span> <span class="badge">${w.pts} คะแนน</span></h2>
+        ${w.stem || ''}
+        ${w.parts.map((p, k) => { const key = w.id + '-' + k; return `<div style="margin:14px 0 18px"><h4>${p.label} <span class="badge">${p.pts} คะแนน</span></h4>${p.q}
+          <textarea class="ans noprint" data-k="${key}" placeholder="พิมพ์คำตอบ/ขั้นตอนคำนวณที่นี่ (บันทึกอัตโนมัติ)">${T.esc(es.wans[key] || '')}</textarea>
+          <details class="reveal"><summary>ดูเฉลย + เกณฑ์ให้คะแนน</summary>${p.answer}${p.rubric ? `<div class="callout key" style="margin-top:8px"><span class="lb">เกณฑ์</span>${p.rubric}</div>` : ''}
+          <div class="row">ให้คะแนนตัวเอง: <input type="number" min="0" max="${p.pts}" step="0.5" data-s="${key}" value="${es.wscore[key] ?? ''}" style="width:80px"> / ${p.pts}</div></details></div>`; }).join('')}
+      </div>`).join('')}
+      <div class="card"><div class="score" id="wsum"></div></div>`;
+    const upd = () => { let s = 0; Object.values(es.wscore).forEach(x => s += +x || 0); document.getElementById('wsum').textContent = `คะแนนอัตนัยที่ให้ตัวเอง: ${T.fmt(s, 2)} / ${total}`; };
+    v.querySelectorAll('textarea.ans').forEach(t => t.oninput = () => { es.wans[t.dataset.k] = t.value; T.save(); });
+    v.querySelectorAll('input[data-s]').forEach(i => i.oninput = () => { es.wscore[i.dataset.s] = i.value; T.save(); upd(); });
+    upd();
+  }
+
+  function viewExamPrint(v) {
+    const E = window.EXAM || { mcq: [], written: [] };
+    v.innerHTML = `<div class="noprint row"><button class="btn" onclick="window.print()">🖨️ พิมพ์</button><a class="btn ghost" href="#/exam" style="text-decoration:none">← กลับ</a></div>
+      <h1>ข้อสอบจำลองปลายภาค ปัญญาประดิษฐ์ (Lecture 08–13)</h1><p>ตอนที่ 1 อัตนัย 3 ข้อ (15 คะแนน) · ตอนที่ 2 ปรนัย ${E.mcq.length} ข้อ (15 คะแนน) · เวลา 3 ชั่วโมง</p>
+      <h2>ตอนที่ 1 · อัตนัย</h2>${E.written.map(w => `<div class="card"><h3>ข้อ ${w.id.replace(/\D/g, '')} · ${w.title} (${w.pts} คะแนน)</h3>${w.stem || ''}${w.parts.map(p => `<h4>${p.label} (${p.pts} คะแนน)</h4>${p.q}`).join('')}</div>`).join('')}
+      <h2>ตอนที่ 2 · ปรนัย</h2><div class="quiz">${E.mcq.map((q, k) => `<div class="qi"><div class="qt">${k + 1}. ${q.q}</div>${q.c.map((c, j) => `<div style="margin-left:14px">${'กขคง'[j]}. ${c}</div>`).join('')}</div>`).join('')}</div>
+      <h2 style="break-before:page">เฉลยปรนัย</h2><table class="tbl">${E.mcq.map((q, k) => `<tr><td style="width:46px"><b>${k + 1}. ${'กขคง'[q.a]}</b></td><td>${q.e || ''}</td></tr>`).join('')}</table>
+      <h2>เฉลยอัตนัย</h2>${E.written.map(w => `<div class="card"><h3>ข้อ ${w.id.replace(/\D/g, '')} · ${w.title}</h3>${w.parts.map(p => `<h4>${p.label}</h4>${p.answer}${p.rubric ? `<p class="mut"><b>เกณฑ์:</b> ${p.rubric}</p>` : ''}`).join('')}</div>`).join('')}`;
+  }
+
+  function viewVisuals(v, id) {
+    const ids = T.lessons.map(l => l.id).filter(x => (T.visuals[x] || []).length);
+    if (!id || !T.visuals[id]) id = ids[0];
+    const l = T.lessons.find(x => x.id === id);
+    v.innerHTML = `<h1>🎨 สื่อภาพประกอบ</h1><p class="lead">ดูภาพอย่างเดียวก่อนก็ได้ — ภาพทีละขั้นให้กด “ถัดไป ▶” หรือ “เล่นอัตโนมัติ” · อยากอ่านคำอธิบายเต็มกดชื่อหัวข้อใต้ภาพ</p>
+      <div class="chips noprint">${ids.map(x => `<a href="#/visuals/${x}" style="${x === id ? 'border-color:var(--brand);color:var(--brand);font-weight:700' : ''}">${x}${x === 'L00' ? ' เริ่มจากศูนย์' : ''}</a>`).join('')}</div>
+      <h2>${l ? l.id + ' · ' + l.title : id}</h2><div id="vgal"></div>`;
+    const g = document.getElementById('vgal');
+    (T.visuals[id] || []).forEach(vis => {
+      const sec = l && l.sections.find(s => s.id === vis.section);
+      const holder = document.createElement('div'); g.appendChild(holder);
+      T.mountVisual(holder, vis, id);
+      const note = document.createElement('div'); note.className = 'vgal-sec';
+      note.innerHTML = sec ? `อยู่ในหัวข้อ: <a href="#/lesson/${id}/${sec.id}">${sec.title}</a>` : (l ? `<a href="#/lesson/${id}">เปิดบทเรียน ${id}</a>` : '');
+      g.insertBefore(note, holder);
+    });
+    window.scrollTo(0, 0);
+  }
+
+  function viewPage(v, id) { const p = T.pages[id]; if (!p) { v.innerHTML = '<p>ยังไม่มีหน้านี้</p>'; return; } v.innerHTML = p.html; p.init && p.init(v); window.scrollTo(0, 0); }
+
+  /* ---------- router ---------- */
+  function route() {
+    const h = location.hash.replace(/^#\/?/, '') || 'home';
+    let [a, b, c] = h.replace(/!all$/, '').split('/');
+    const v = document.getElementById('view');
+    let active = a, crumb = 'ติว AI ปลายภาค';
+    if (a === 'lesson') { b = (b || '').replace(/!all$/, ''); c = c && c.replace(/!all$/, ''); active = b; const l = T.lessons.find(x => x.id === b); crumb = l ? `${l.id} · ${l.title}` : crumb; side(active); viewLesson(v, b, c); }
+    else if (a === 'visuals') { side('visuals'); crumb = 'สื่อภาพประกอบ'; viewVisuals(v, (b || '').replace(/!all$/, '')); }
+    else if (a === 'flash') { side('flash'); crumb = 'แฟลชการ์ด'; viewFlash(v); window.scrollTo(0, 0); }
+    else if (a === 'formulas') { side('formulas'); crumb = 'สูตรทั้งหมด'; viewPage(v, 'formulas'); }
+    else if (a === 'exam' && b === 'mcq') { side('mcq'); crumb = 'ข้อสอบจำลอง · ปรนัย'; viewMCQ(v); }
+    else if (a === 'exam' && b === 'written') { side('written'); crumb = 'ข้อสอบจำลอง · อัตนัย'; viewWritten(v); window.scrollTo(0, 0); }
+    else if (a === 'exam' && b === 'print') { side('exam'); crumb = 'พิมพ์ข้อสอบจำลอง'; viewExamPrint(v); window.scrollTo(0, 0); }
+    else if (a === 'exam') { side('exam'); crumb = 'ข้อสอบจำลอง'; viewExamHome(v); window.scrollTo(0, 0); }
+    else { side('home'); viewHome(v); window.scrollTo(0, 0); }
+    document.getElementById('crumb').textContent = crumb;
+    document.getElementById('side').classList.remove('open');
+  }
+  T.route = route;
+  window.addEventListener('hashchange', route);
+  window.addEventListener('DOMContentLoaded', () => {
+    if (store.dark) document.body.classList.add('dark');
+    document.getElementById('darkBtn').onclick = () => { store.dark = !store.dark; document.body.classList.toggle('dark', store.dark); T.save(); };
+    document.getElementById('menuBtn').onclick = () => document.getElementById('side').classList.toggle('open');
+    const z = document.getElementById('zoom');
+    document.addEventListener('click', e => { const im = e.target.closest('figure.slide img'); if (im) { z.querySelector('img').src = im.src; z.style.display = 'flex'; } });
+    z.onclick = () => z.style.display = 'none';
+    route();
+  });
+  return T;
+})();
+</script>
+<!-- content files (each registers itself via TUTOR.addLesson / window.EXAM / window.FLASHCARDS) -->
+<script src="tutor/L00.js"></script>
+<script src="tutor/L08.js"></script>
+<script src="tutor/L09.js"></script>
+<script src="tutor/L10.js"></script>
+<script src="tutor/L11.js"></script>
+<script src="tutor/L12.js"></script>
+<script src="tutor/L13.js"></script>
+<script src="tutor/vis_L00.js"></script>
+<script src="tutor/vis_L08.js"></script>
+<script src="tutor/vis_L09.js"></script>
+<script src="tutor/vis_L10.js"></script>
+<script src="tutor/vis_L11.js"></script>
+<script src="tutor/vis_L12.js"></script>
+<script src="tutor/vis_L13.js"></script>
+<script src="tutor/formulas.js"></script>
+<script src="tutor/exam_data.js"></script>
+<script src="tutor/flashcards.js"></script>
+</body>
+</html>
