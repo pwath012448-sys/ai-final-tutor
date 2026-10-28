@@ -166,6 +166,16 @@ body.dark{--c1:#4dabf7;--c1l:#1b3a5c;--c2:#ff922b;--c2l:#4a2b14;--c3:#51cf66;--c
 .stepper .dots i.on{background:var(--brand)}
 .stepper .sno{font-size:13px;color:var(--mut);margin-left:auto}
 .vgal-sec{font-size:13px;color:var(--mut);margin:-4px 0 6px 6px}
+.prio{font-size:13px;font-weight:700;border-radius:20px;padding:2px 10px;margin-left:8px;vertical-align:3px;white-space:nowrap}
+.prio.must{background:#ffe3e3;color:#c92a2a}.prio.nice{background:#fff3bf;color:#9c5d00}
+body.dark .prio.must{background:#4a1f1f;color:#ff8787}body.dark .prio.nice{background:#453812;color:#ffd43b}
+.rush{list-style:none;padding:0;margin:0 0 10px}
+.rush li{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:0 0 8px}
+.rush li.done{opacity:.55}
+.rush li input{width:22px;height:22px;margin-top:3px;flex:0 0 22px}
+.rush li a{font-weight:700;text-decoration:none}
+.rush .what{color:var(--mut);font-size:14.5px}
+.rushbtn{display:block;text-align:center;font-size:19px;font-weight:800;text-decoration:none;color:#fff;background:linear-gradient(90deg,#e03131,#f76707);border-radius:14px;padding:14px;margin:0 0 16px}
 @media print{#side,#top,.noprint{display:none!important}#view{max-width:none;padding:0}body{background:#fff;color:#000}.card,.quiz .qi{break-inside:avoid}}
 </style>
 </head>
@@ -292,6 +302,7 @@ window.TUTOR = (function () {
     const link = (href, inner, on) => `<a class="nav${on ? ' on' : ''}" href="${href}">${inner}</a>`;
     let h = `<div class="logo">🎓 ติว AI ปลายภาค<small>Lecture 08–13 · สอนทีละขั้น + ข้อสอบจำลอง</small></div>`;
     h += link('#/home', '🏠 หน้าแรก / แผนอ่าน', active === 'home');
+    h += link('#/rush', '🔥 อ่านด่วนก่อนสอบ', active === 'rush');
     h += `<div class="grp">บทเรียน</div>`;
     T.lessons.forEach(l => { h += link('#/lesson/' + l.id, `<span class="num">${l.id}</span><span>${l.navTitle || l.title}</span>${done[l.id] ? '<span class="done">✔</span>' : ''}`, active === l.id); });
     h += `<div class="prog">อ่านจบแล้ว ${n}/${T.lessons.length} บท<div class="bar"><i style="width:${T.lessons.length ? 100 * n / T.lessons.length : 0}%"></i></div></div>`;
@@ -308,7 +319,7 @@ window.TUTOR = (function () {
   /* ---------- views ---------- */
   function viewHome(v) {
     const done = store.done || {};
-    v.innerHTML = `<div class="home-hero"><h1>ติวปลายภาค ปัญญาประดิษฐ์ (Lecture 08–13)</h1>
+    v.innerHTML = `<a class="rushbtn" href="#/rush">🔥 สอบพรุ่งนี้? กดที่นี่ — อ่านด่วนเฉพาะหัวข้อสำคัญ</a><div class="home-hero"><h1>ติวปลายภาค ปัญญาประดิษฐ์ (Lecture 08–13)</h1>
       <p>เว็บนี้สอนเนื้อหาทั้ง 6 บทแบบเข้าใจจริง: อธิบายทีละขั้น · ภาพจากสไลด์ · เครื่องมือคำนวณให้กดลองเอง · แบบฝึกท้ายบท · แฟลชการ์ด · และ <b>ข้อสอบจำลองรูปแบบเดียวกับข้อสอบจริง</b> (อัตนัย 3 ข้อ 15 คะแนน + ปรนัย 50 ข้อ 15 คะแนน)</p>
       <div class="row"><a class="btn" href="#/lesson/${T.lessons[0] ? T.lessons[0].id : 'L08'}" style="text-decoration:none">เริ่มเรียนบทแรก →</a><a class="btn ghost" style="background:#fff;text-decoration:none" href="#/exam">ไปที่ข้อสอบจำลอง</a></div></div>
       <div class="callout think"><span class="lb">เริ่มจากศูนย์?</span>เริ่มที่บท <a href="#/lesson/L00"><b>L00 · เริ่มจากศูนย์</b></a> (คณิตและศัพท์พื้นฐานทั้งหมดที่ต้องใช้ พร้อมภาพ) → แล้วเรียน L08 → L13 ตามลำดับ · ในแต่ละบทให้ดู <b>“บทนี้ใน 1 ภาพ”</b> ด้านบนก่อน แล้วอ่านทีละหัวข้อ — ทุกหัวข้อมี<b>ภาพประกอบอยู่ใต้หัวข้อ</b> ให้ดูภาพก่อนอ่านตัวหนังสือ</div>
@@ -333,8 +344,9 @@ window.TUTOR = (function () {
     const done = (store.done = store.done || {});
     v.innerHTML = `<span class="badge">${l.id}</span><span class="mut">${l.slides || ''}</span>
       <h1>${l.title}</h1><p class="lead">${l.intro || l.short || ''}</p>
-      <div class="chips noprint">${l.sections.map(s => `<a href="#/lesson/${l.id}/${s.id}">${s.title}</a>`).join('')}${l.quiz ? `<a href="#/lesson/${l.id}/quiz">📝 แบบฝึกท้ายบท</a>` : ''}</div>
-      ${l.sections.map(s => `<section id="sec-${s.id}"><h2>${s.title}</h2>${s.html}</section>`).join('')}
+      <div class="chips noprint">${l.sections.map(s => { const p = prioOf(l.id, s.id); return `<a href="#/lesson/${l.id}/${s.id}">${p ? (p.tier === 'must' ? '🔥 ' : '⭐ ') : ''}${s.title}</a>`; }).join('')}${l.quiz ? `<a href="#/lesson/${l.id}/quiz">📝 แบบฝึกท้ายบท</a>` : ''}</div>
+      ${T.PRIORITY.some(p => p.lec === l.id) ? `<div class="callout warn"><span class="lb">🔥 บทนี้เน้นอ่าน</span>${T.PRIORITY.filter(p => p.lec === l.id).map(p => { const s = l.sections.find(x => x.id === p.sec); return s ? `<a href="#/lesson/${l.id}/${p.sec}">${p.tier === 'must' ? '🔥' : '⭐'} ${s.title}</a>` : ''; }).filter(Boolean).join(' · ')} — <a href="#/rush">ดูแผนอ่านด่วนทั้งหมด</a></div>` : ''}
+      ${l.sections.map(s => `<section id="sec-${s.id}"><h2>${s.title}${prioBadge(prioOf(l.id, s.id))}</h2>${s.html}</section>`).join('')}
       ${l.quiz ? `<section id="sec-quiz"><h2>📝 แบบฝึกท้ายบท ${l.id} (${l.quiz.length} ข้อ)</h2><div id="lquiz"></div></section>` : ''}
       <div class="card" style="margin-top:24px"><div class="row" style="justify-content:space-between">
         ${prev ? `<a class="btn ghost" href="#/lesson/${prev.id}" style="text-decoration:none">← ${prev.id}</a>` : '<span></span>'}
@@ -498,6 +510,60 @@ window.TUTOR = (function () {
     window.scrollTo(0, 0);
   }
 
+  /* ---------- rush plan: what to read before the exam (weak at calculation) ---------- */
+  T.PRIORITY = [
+    { lec: 'L00', sec: 'ai-ml-dl', tier: 'must', what: 'ภาพใหญ่: AI/ML/DL และการเรียน 4 แบบ (มีเฉลย · ไม่มีเฉลย · รางวัล)' },
+    { lec: 'L08', sec: 'perceptron', tier: 'must', what: 'Perceptron = กรรมการให้คะแนนถ่วงน้ำหนัก · ทายผิดค่อยปรับ' },
+    { lec: 'L08', sec: 'gd', tier: 'must', what: 'Gradient descent = เดินลงเขา · learning rate = ความยาวก้าว' },
+    { lec: 'L08', sec: 'mlp', tier: 'nice', what: 'ทำไมต้องหลายชั้น + activation (XOR)' },
+    { lec: 'L09', sec: 'families', tier: 'must', what: '4 ตระกูล clustering: K-Means · Hierarchical · GMM · DBSCAN ต่างกันยังไง' },
+    { lec: 'L09', sec: 'kmeans', tier: 'must', what: 'K-Means ทำงานยังไง — ดูภาพทีละขั้น ไม่ต้องคิดเลขเอง' },
+    { lec: 'L09', sec: 'pca', tier: 'nice', what: 'PCA = ลดมิติ (ไม่ใช่การจัดกลุ่ม)' },
+    { lec: 'L10', sec: 'loop', tier: 'must', what: 'องค์ประกอบ RL: agent · state · action · reward · policy' },
+    { lec: 'L10', sec: 'qlearn', tier: 'must', what: 'Q-learning + ε-greedy (สูตรแทนค่า: 1 − ε + ε/|A|)' },
+    { lec: 'L10', sec: 'return', tier: 'nice', what: 'Return: รางวัลอนาคตมีค่าน้อยลงด้วย γ' },
+    { lec: 'L10', sec: 'dqn', tier: 'nice', what: 'DQN ทำไมต้องมี replay + target network (เพื่อเสถียร)' },
+    { lec: 'L11', sec: 'conv', tier: 'must', what: 'Convolution = ไฟฉาย 3×3 เลื่อนทั่วภาพ คูณแล้วบวก' },
+    { lec: 'L11', sec: 'size', tier: 'must', what: 'สูตรขนาด output O = (I − K + 2P)/S + 1 · pooling' },
+    { lec: 'L11', sec: 'tasks', tier: 'must', what: '4 งานภาพ: classification · detection · semantic · instance' },
+    { lec: 'L11', sec: 'cnn', tier: 'nice', what: 'ทำไม CNN ใช้พารามิเตอร์น้อย + สูตร (K²·Cin + 1)·Cout' },
+    { lec: 'L12', sec: 'attention', tier: 'must', what: 'Attention = ไฮไลต์คำที่เกี่ยวข้อง (Query · Key · Value) — แนวคิดพอ' },
+    { lec: 'L12', sec: 'transformer', tier: 'must', what: 'Transformer · positional encoding · BERT vs GPT vs T5' },
+    { lec: 'L12', sec: 'embed', tier: 'nice', what: 'Embedding: คำคล้ายกันอยู่ใกล้กัน · ปัญหาคำว่า “bank”' },
+    { lec: 'L12', sec: 'decoding', tier: 'nice', what: 'Temperature · pretrain → SFT → RLHF · prompt' },
+    { lec: 'L13', sec: 'agent', tier: 'must', what: 'Agent · tool calling (โมเดลไม่รัน tool เอง) · ReAct' },
+    { lec: 'L13', sec: 'qubit', tier: 'must', what: 'Qubit = เหรียญที่ยังหมุน · P(0) = α² · ต้องวัดหลายรอบ' },
+    { lec: 'L13', sec: 'think', tier: 'nice', what: 'CoT · self-consistency (โหวต) · Tree of Thoughts' },
+    { lec: 'L13', sec: 'rag', tier: 'nice', what: 'RAG = ค้นเอกสารก่อนตอบ · MCP = ปลั๊กมาตรฐาน' },
+    { lec: 'L13', sec: 'reliab', tier: 'nice', what: 'Agent พลาดสะสม pⁿ · prompt injection' },
+  ];
+  const prioOf = (lec, sec) => T.PRIORITY.find(p => p.lec === lec && p.sec === sec);
+  const prioBadge = p => p ? `<span class="prio ${p.tier}">${p.tier === 'must' ? '🔥 ต้องอ่าน' : '⭐ ถ้ามีเวลา'}</span>` : '';
+  function viewRush(v) {
+    const done = (store.rush = store.rush || {});
+    const key = p => p.lec + '/' + p.sec;
+    const total = T.PRIORITY.length, nd = T.PRIORITY.filter(p => done[key(p)]).length;
+    const must = T.PRIORITY.filter(p => p.tier === 'must'), ndm = must.filter(p => done[key(p)]).length;
+    let h = `<h1>🔥 อ่านด่วนก่อนสอบ</h1>
+      <p class="lead">สำหรับคนเวลาน้อยและไม่ถนัดคำนวณ — อ่านเฉพาะหัวข้อเหล่านี้ตามลำดับ · กดชื่อหัวข้อเพื่อไปที่หัวข้อนั้นในบทเรียน · <b>ดูภาพประกอบก่อน</b> แล้วอ่านกล่อง “จำ” / “ระวัง” · ข้ามสูตรยาว ๆ ได้ (อยู่ในชีท A4 แล้ว)</p>
+      <div class="callout key"><span class="lb">ความคืบหน้า</span>🔥 ต้องอ่าน ${ndm}/${must.length} · ทั้งหมด ${nd}/${total} — ถ้าเวลาน้อยมาก ทำแค่ 🔥 ให้ครบก่อน</div>`;
+    let last = '', open = false;
+    T.PRIORITY.forEach(p => {
+      const l = T.lessons.find(x => x.id === p.lec); const s = l && l.sections.find(x => x.id === p.sec);
+      if (!s) return;
+      if (p.lec !== last) { if (open) h += '</ol>'; h += `<h3 style="margin:16px 0 8px">${p.lec} · ${l.navTitle || l.title}</h3><ol class="rush">`; open = true; last = p.lec; }
+      const k = key(p);
+      h += `<li class="${done[k] ? 'done' : ''}"><input type="checkbox" data-k="${k}" ${done[k] ? 'checked' : ''}><div>${p.tier === 'must' ? '🔥' : '⭐'} <a href="#/lesson/${p.lec}/${p.sec}">${s.title}</a><div class="what">${p.what}</div></div></li>`;
+    });
+    if (open) h += '</ol>';
+    h += `<h2>เสร็จแล้วทำต่อ</h2><ol class="steps">
+      <li><a href="#/exam/mcq">ข้อสอบจำลองปรนัย (โหมดฝึก)</a> — ทำ 20–50 ข้อ อ่านเฉลยข้อที่ผิด</li>
+      <li>ชีท A4 <b>หน้า 20 กับดัก 24 ข้อ</b> + <b>หน้า 1 คู่คำที่มักสับสน</b></li>
+      <li>ฝึกแทนสูตรบรรทัดเดียว 5 อย่าง: ε-greedy · P(0)=α² · O=(I−K+2P)/S+1 · (K²·Cin+1)·Cout · pⁿ</li></ol>`;
+    v.innerHTML = h;
+    v.querySelectorAll('.rush input').forEach(c => c.onchange = () => { done[c.dataset.k] = c.checked; T.save(); const y = window.scrollY; viewRush(v); window.scrollTo(0, y); });
+  }
+
   function viewPage(v, id) { const p = T.pages[id]; if (!p) { v.innerHTML = '<p>ยังไม่มีหน้านี้</p>'; return; } v.innerHTML = p.html; p.init && p.init(v); window.scrollTo(0, 0); }
 
   /* ---------- router ---------- */
@@ -507,6 +573,7 @@ window.TUTOR = (function () {
     const v = document.getElementById('view');
     let active = a, crumb = 'ติว AI ปลายภาค';
     if (a === 'lesson') { b = (b || '').replace(/!all$/, ''); c = c && c.replace(/!all$/, ''); active = b; const l = T.lessons.find(x => x.id === b); crumb = l ? `${l.id} · ${l.title}` : crumb; side(active); viewLesson(v, b, c); }
+    else if (a === 'rush') { side('rush'); crumb = 'อ่านด่วนก่อนสอบ'; viewRush(v); window.scrollTo(0, 0); }
     else if (a === 'visuals') { side('visuals'); crumb = 'สื่อภาพประกอบ'; viewVisuals(v, (b || '').replace(/!all$/, '')); }
     else if (a === 'flash') { side('flash'); crumb = 'แฟลชการ์ด'; viewFlash(v); window.scrollTo(0, 0); }
     else if (a === 'formulas') { side('formulas'); crumb = 'สูตรทั้งหมด'; viewPage(v, 'formulas'); }
